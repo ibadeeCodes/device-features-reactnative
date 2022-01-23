@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux"
 import Colors from "../constants/Colors"
 import * as placesActions from "../store/places-actions"
 import ImagePicker from "../components/ImagePicker"
-// import LocationPicker from "../components/LocationPicker"
+import LocationPicker from "../components/LocationPicker"
 
 const NewPlaceScreen = (props) => {
   const [titleValue, setTitleValue] = useState("")
@@ -53,17 +53,16 @@ const NewPlaceScreen = (props) => {
           value={titleValue}
         />
         <ImagePicker onImageTaken={imageTakenHandler} />
-        {/* <LocationPicker
+        <LocationPicker
           navigation={props.navigation}
+          route={props.route}
           onLocationPicked={locationPickedHandler}
-        /> */}
-
-        <TouchableOpacity
+        />
+        <Button
+          title="Save Place"
+          color={Colors.primary}
           onPress={savePlaceHandler}
-          style={styles.appButtonContainer}
-        >
-          <Text style={styles.appButtonText}>Save Place</Text>
-        </TouchableOpacity>
+        />
       </View>
     </ScrollView>
   )
@@ -103,6 +102,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     textTransform: "uppercase",
+  },
+  LocSelectionBtnContainer: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    marginHorizontal: 5,
   },
 })
 

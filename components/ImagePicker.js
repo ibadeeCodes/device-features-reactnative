@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { View, Button, Image, Text, StyleSheet, Alert } from "react-native"
 import * as ImagePicker from "expo-image-picker"
+import { Ionicons } from "@expo/vector-icons"
 import Colors from "../constants/Colors"
 
 const ImgPicker = (props) => {
@@ -27,7 +28,10 @@ const ImgPicker = (props) => {
     <View style={styles.imagePicker}>
       <View style={styles.imagePreview}>
         {!pickedImage ? (
-          <Text>No image picked yet.</Text>
+          <View style={styles.fallbackContainer}>
+            <Ionicons name={"image-outline"} size={38} color={"#677483"} />
+            <Text>No image picked yet.</Text>
+          </View>
         ) : (
           <Image style={styles.image} source={{ uri: pickedImage }} />
         )}
@@ -60,6 +64,10 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  fallbackContainer: {
+    display: "flex",
+    alignItems: "center",
   },
 })
 

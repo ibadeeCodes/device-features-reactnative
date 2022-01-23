@@ -8,28 +8,29 @@ import {
   StyleSheet,
 } from "react-native"
 import * as Location from "expo-location"
-import * as Permissions from "expo-permissions"
 
 import Colors from "../constants/Colors"
 import MapPreview from "./MapPreview"
+import { Ionicons } from "@expo/vector-icons"
 
 const LocationPicker = (props) => {
   const [isFetching, setIsFetching] = useState(false)
   const [pickedLocation, setPickedLocation] = useState()
 
-  const mapPickedLocation = props.navigation.getParam("pickedLocation")
+  // console.log(props.navigation)
+  // console.log(props.route)
 
   const { onLocationPicked } = props
 
   useEffect(() => {
-    if (mapPickedLocation) {
-      setPickedLocation(mapPickedLocation)
-      onLocationPicked(mapPickedLocation)
+    if (props.route.params?.pickedLocation) {
+      setPickedLocation(props.route.params?.pickedLocation)
+      onLocationPicked(props.route.params?.pickedLocation)
     }
-  }, [mapPickedLocation, onLocationPicked])
+  }, [props.route.params?.pickedLocation, onLocationPicked])
 
   const verifyPermissions = async () => {
-    const result = await Permissions.askAsync(Permissions.LOCATION)
+    let result = await Location.requestForegroundPermissionsAsync()
     if (result.status !== "granted") {
       Alert.alert(
         "Insufficient permissions!",
@@ -84,7 +85,11 @@ const LocationPicker = (props) => {
         {isFetching ? (
           <ActivityIndicator size="large" color={Colors.primary} />
         ) : (
-          <Text>No location chosen yet!</Text>
+          <View style={styles.fallbackContainer}>
+            <Ionicons name={"location-outline"} size={38} color={"#677483"} />
+
+            <Text>No location chosen yet!</Text>
+          </View>
         )}
       </MapPreview>
       <View style={styles.actions}>
@@ -113,11 +118,17 @@ const styles = StyleSheet.create({
     height: 150,
     borderColor: "#ccc",
     borderWidth: 1,
+    borderRadius: 10,
+    overflow: "hidden",
   },
   actions: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     width: "100%",
+  },
+  fallbackContainer: {
+    display: "flex",
+    alignItems: "center",
   },
 })
 
