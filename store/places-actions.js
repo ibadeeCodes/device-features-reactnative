@@ -1,27 +1,36 @@
 import * as FileSystem from "expo-file-system"
 
 import { insertPlace, fetchPlaces } from "../helpers/db"
-// import ENV from "../env"
+import ENV from "../.env"
 
 export const ADD_PLACE = "ADD_PLACE"
 export const SET_PLACES = "SET_PLACES"
 
 export const addPlace = (title, image, location) => {
   return async (dispatch) => {
+    // GOOGLE api.
     // const response = await fetch(
     //   `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&key=${ENV.googleApiKey}`
     // )
 
-    // if (!response.ok) {
-    //   throw new Error("Something went wrong!")
-    // }
+    // GEOAPIFY api.
+    const response = await fetch(
+      `https://api.geoapify.com/v1/geocode/reverse?lat=${location.lat}&lon=${location.lng}&apiKey=${ENV.googleApiKey}`,
+      {
+        method: "GET",
+      }
+    )
 
-    // const resData = await response.json()
-    // if (!resData.results) {
-    //   throw new Error("Something went wrong!")
-    // }
+    if (!response.ok) {
+      throw new Error("Something went wrong!")
+    }
 
-    // const address = resData.results[0].formatted_address
+    const resData = await response.json()
+    if (!resData.features) {
+      throw new Error("Something went wrong!")
+    }
+
+    const address = resData.features[0].properties.formatted
 
     const fileName = image.split("/").pop()
     const newPath = FileSystem.documentDirectory + fileName
@@ -34,12 +43,9 @@ export const addPlace = (title, image, location) => {
       const dbResult = await insertPlace(
         title,
         newPath,
-        // address,
-        // location.lat,
-        // location.lng
-        "dummy",
-        12.3,
-        4.9
+        address,
+        location.lat,
+        location.lng
       )
       console.log(dbResult)
       dispatch({
@@ -48,15 +54,10 @@ export const addPlace = (title, image, location) => {
           id: dbResult.insertId,
           title: title,
           image: newPath,
-          //   address: address,
-          //   coords: {
-          //     lat: location.lat,
-          //     lng: location.lng,
-          //   },
-          address: "dummy",
+          address: address,
           coords: {
-            lat: 12.3,
-            lng: 4.9,
+            lat: location.lat,
+            lng: location.lng,
           },
         },
       })
